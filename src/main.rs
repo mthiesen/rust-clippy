@@ -149,7 +149,16 @@ pub fn main() {
         for target in package.targets {
             let args = std::env::args()
                 .skip(1)
-                .filter(|a| a != "--all" && !a.starts_with("--manifest-path="));
+                .enumerate()
+                .filter_map(|(i, a)|
+                    if (i == 0 && a.to_ascii_lowercase() == "clippy") ||
+                        a == "--all" ||
+                        a.starts_with("--manifest-path=") {
+                        None
+                    } else {
+                        Some(a)
+                    }
+                );
 
             let args = std::iter::once(format!("--manifest-path={}", manifest_path)).chain(args);
             if let Some(first) = target.kind.get(0) {
